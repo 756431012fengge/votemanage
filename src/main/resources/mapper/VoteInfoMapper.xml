@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.freesun.votemanager.mapper.VoteInfoMapper">
+
+    <resultMap id="voteList" type="VoteInfo">
+        <id column="sid" property="sid"/>
+        <result column="title" property="title"/>
+        <result column="optionCount" property="optionCount"/>
+        <result column="voteCount" property="voteCount"/>
+    </resultMap>
+    <sql id="housesel">
+        <trim prefix="where" prefixOverrides="and ||or ">
+            <if test="title !=null and title!=''">
+                and s.title like CONCAT('%',#{title} ,'%')
+            </if>
+        </trim>
+    </sql>
+    <select id="getVoteList" resultType="VoteInfo" resultMap="voteList">
+        SELECT s.sid  sid,s.title ,COUNT(DISTINCT o.oid) as optionCount,COUNT(DISTINCT i.vid) as voteCount
+	    FROM `subject` s
+	    LEFT JOIN `options` o ON s.sid=o.osid
+        LEFT JOIN `item` i ON s.sid=i.sid
+        <include refid="housesel"></include>
+        GROUP BY s.sid,s.title
+    </select>
+
+</mapper>

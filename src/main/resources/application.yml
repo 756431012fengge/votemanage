@@ -1,0 +1,59 @@
+
+#配置druid数据源
+spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/vatemanage?characterEncoding=utf8&serverTimezone=Asia/Shanghai
+      username: root
+      password: 123
+      max-active: 20
+      max-wait: 5000
+      initial-size: 1
+      filters: stat,log4j,wall
+      stat-view-servlet:
+        login-username: root
+        login-password: 123456
+        allow:
+        deny:
+        url-pattern: /druid/*
+        enabled: true
+      validation-query: SELECT 'x' #验证链接
+  #配置mybatis-plus
+  mvc:
+    static-path-pattern: /**
+  resources:
+    static-locations: classpath:/templates/,classpath:/META-NF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations:
+    - classpath:mapper/*Mapper.xml
+  #自动增长主键
+  global-config:
+    db-config:
+      id-type: auto
+    banner: false
+  type-aliases-package: com.freesun.votemanager.pojo
+#shiro的配置
+shiro:
+  hash-algorithm-name: md5
+  hash-iterations: 2
+  anon-urls:
+    - /index.html*
+    - /register.html*
+    - /menu/toLogin*
+    - /user/login*
+    - /user/toUsername/*
+    - /user/toRegister*
+    - /resources/**
+    - /menu/toMain*
+  login-url: /doLogin.html
+  #log-out-url: /doLogin.html
+  authc-ulrs:
+    - /**
+#pagehelper分页插件配置
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  pageSizeZero: true

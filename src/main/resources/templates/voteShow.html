@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>投票-展示</title>
+    <link rel="stylesheet" href="/resources/layui/css/layui.css" media="all">
+    <style type="text/css">
+        .forli{
+            font-size: 30px;
+            color: #1E9FFF;
+        }
+        .fordiv{
+            line-height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md2 ">
+        </div>
+        <div class="layui-col-md8">
+            <ul class="layui-nav">
+                <li class="layui-nav-item">
+                    <a href=""><i class="layui-icon" style="font-size: 20px; color: #1E9FFF;">&#xe68e;</i> 首页</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="">管理投票</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;" class="addSubject"><i class="layui-icon" >&#xe61f;</i> 添加投票</a></dd>
+                        <dd><a href="javascript:;" class="safeVote"><i class="layui-icon" >&#xe631;</i> 维护投票</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item" >
+                    <a href="javascript:;" id="username"><img src="//t.cn/RCzsdCq" class="layui-nav-img"></a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="/menu/toLogout"><i class="layui-icon" >&#xe65c;</i> 退出登录</a></dd>
+                    </dl>
+                </li>
+            </ul>
+            <div class="layui-row" style="margin-top: 10px;border-bottom:1px solid #FF5722">
+                <div class="layui-col-md4" style="font-size: 30px"><i class="layui-icon" style="font-size: 30px" >&#xe705;</i> 查看投票</div>
+                <div class="layui-col-md4">
+                    .
+                </div>
+                <div class="layui-col-md4">
+                </div>
+            </div>
+            <div style="margin-top: 20px" id="optsInfo">
+                <h2>
+                    <span><i class="layui-icon layui-icon-reply-fill" style="font-size: 30px; color: #1E9FFF;"></i> 选出你心目中最好的下载工具</span>
+                </h2>
+                <br/>
+                <div class="layui-progress layui-progress-big" lay-showPercent="true">
+                    <div class="layui-progress-bar layui-bg-green" lay-percent="80%"></div>
+                </div>
+                <div style="line-height: 30px;">5票</div>
+
+            </div>
+        </div>
+        <div class="layui-col-md2">
+        </div>
+    </div>
+
+</div>
+<script src="/resources/layui/layui.js"></script>
+<script>
+    layui.use(['element'], function(){
+        var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+        var $=layui.jquery;
+
+        var sid="";//当前主题ID
+        var uid="";//当前用户id
+        $(function () {
+            var url=window.location.search; //获取url中"?"符后的字串  
+            if(url.indexOf("?")!=-1) {
+                // ?sid=6&uid=2
+                var sLi= url.split("&")[0];
+                var uLi= url.split("&")[1];
+                sid = sLi.substr(sLi.indexOf("=") + 1);
+                uid = uLi.substr(uLi.indexOf("=") + 1);
+                $.ajax({
+                    url:"/user/toGetUserById",
+                    type:"GET",
+                    data:{"id":uid},
+                    success:function (result) {
+                        $("#username").append(result.map.uname);
+                    }
+                })
+            }
+            detail();
+        })
+        //获取地址ID显示投票
+        function detail() {
+                $.ajaxSettings.async = false;
+                $.ajax({
+                    url:"/options/toGetOptionsInfo",
+                    type:"GET",
+                    data:{"id":sid},
+                    success:function (result) {
+                        if (result.code==200){
+                            $("#optsInfo").empty();
+                            layui.use('element', function(){
+                                var element = layui.element;
+                                var optList=result.map.optionsInfo;
+                                var hi=$("<i></i>").addClass("layui-icon layui-icon-reply-fill forli");
+                                var h2=$("<h2></h2>")
+                                var span=$("<span></span>").append(hi).append(result.map.subject.title).appendTo(h2);
+                                var divtou=$("<div></div>").addClass("layui-input-block")
+                                    .append("共有"+optList.length+" 个选项,已有"+result.map.sum+" 个投票");
+                                var div1=$("<div></div>").addClass("layui-form-item").append(divtou);
+                                $("#optsInfo").append(h2).append(div1);
+                            /*<div class="layui-progress layui-progress-big" lay-showPercent="true">
+                                    <div class="layui-progress-bar layui-bg-green" lay-percent="80%"></div>
+                                    </div>
+                                    <div style="line-height: 30px;">5票</div>*/
+                                $.each(optList,function (index,item) {
+                                   var optDiv=$("<div></div>").addClass("layui-progress layui-progress-big")
+                                                .attr("lay-showPercent","true");
+                                    var jinDiv=$("<div></div>").addClass("layui-progress-bar layui-bg-blue")
+                                                .attr("lay-percent",item.percent).appendTo(optDiv);
+                                    var voteDiv=$("<div></div>").addClass("fordiv").append(item.ocontent+" ("+item.optCounts+")票");
+                                    $("#optsInfo").append(optDiv).append(voteDiv);
+                                });
+                                var i3=$("<i></i>").addClass("layui-icon layui-icon-prev");
+                                var btn2=$("<button></button>").addClass("layui-btn layui-btn-radius layui-btn-normal backbtn")
+                                    .attr("type","button").append(i3).append("返回列表");
+                                var div4=$("<div></div>").append(btn2);
+                                $("#optsInfo").append(div4);
+                                element.render();
+                            })
+                        }
+                    }
+                })
+            $.ajaxSettings.async = true;
+        }
+        $(document).on("click",".backbtn",function () {
+           location.href="voteDetail.html?sid="+sid+"&uid="+uid;
+        })
+        $(".addSubject").on("click",function () {
+            //location.href="saveSubject.html?uid="+uid;
+            $.ajax({
+                url:'/role/toSaveSubject',
+                type:'GET',
+                success:function (result) {
+                    if (result.code==200 ){
+                        location.href="saveSubject.html?uid="+uid;
+                    } else if (result.code==100) {
+                        layer.msg(result.map.message);
+                    }
+                }
+            })
+        });
+        $(".safeVote").on("click",function () {
+            //location.href="saveSubject.html?uid="+uid;
+            $.ajax({
+                url:'/role/toSafeVote',
+                type:'GET',
+                success:function (result) {
+                    if (result.code==200 ){
+                        location.href="safeVote.html?uid="+uid;
+                    } else if (result.code==100) {
+                        layer.msg(result.map.message);
+                    }
+                }
+            })
+        });
+    })
+</script>
+</body>
+</html>

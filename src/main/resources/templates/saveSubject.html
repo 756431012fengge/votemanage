@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加-投票</title>
+    <link rel="stylesheet" href="/resources/layui/css/layui.css" media="all">
+    <style>
+        .foript{
+            display: inline;
+            width: 50%
+        }
+    </style>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md2 ">
+        </div>
+        <div class="layui-col-md8">
+            <ul class="layui-nav">
+                <li class="layui-nav-item">
+                    <a href=""><i class="layui-icon" style="font-size: 20px; color: #1E9FFF;">&#xe68e;</i> 首页</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="">管理投票</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;" class="addSubject"><i class="layui-icon" >&#xe61f;</i> 添加投票</a></dd>
+                        <dd><a href="javascript:;" class="safeVote"><i class="layui-icon" >&#xe631;</i> 维护投票</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item" >
+                    <a href="javascript:;" id="username"><img src="//t.cn/RCzsdCq" class="layui-nav-img"></a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="/menu/toLogout"><i class="layui-icon" >&#xe65c;</i> 退出登录</a></dd>
+                    </dl>
+                </li>
+            </ul>
+            <div class="layui-row" style="margin-top: 10px">
+                <div class="layui-col-md4" style="font-size: 30px"><i class="layui-icon" style="font-size: 30px" >&#xe705;</i> 添加投票</div>
+            </div>
+            <div class="layui-row" style="margin-top: 10px">
+                <div class="layui-col-md2" >
+                   .
+                </div>
+                <div class="layui-col-md8" >
+                    <form class="layui-form" lay-filter="example">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">投票标题:</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="title" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">单选框</label>
+                            <div class="layui-input-block">
+                                <input type="radio" name="type" value="0" title="单选" checked>
+                                <input type="radio" name="type" value="1" title="多选">
+                            </div>
+                        </div>
+                        <div id="opts">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">投票选项:</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="options" required  lay-verify="required" placeholder="选项不得重复"  class="layui-input" style="display: inline;width: 50%">
+                            </div>
+                        </div>
+                        <!--<div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <input type="text" name="options" required  lay-verify="required" placeholder="选项不得重复"  class="layui-input" style="display: inline;width: 50%">
+                                    <a href="">删除</a>
+                            </div>
+                        </div>-->
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit lay-filter="subbtn">确定</button>
+                                <button type="button" class="layui-btn layui-btn-primary addbtn">增加选项</button>
+                                <button type="button" class="layui-btn layui-btn-primary backbtn">返回</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="layui-col-md2">
+
+                </div>
+            </div>
+
+        </div>
+        <div class="layui-col-md2">
+        </div>
+    </div>
+</div>
+<script src="/resources/layui/layui.js"></script>
+<script>
+    //Demo
+    layui.use(['form','element'], function(){
+        var form = layui.form;
+        var $=layui.jquery;
+
+        $(function () {
+            detail();
+        });
+        //获取地址ID显示用户名
+        var uid;
+        function detail() {
+            var url=window.location.search; //获取url中"?"符后的字串  
+            if(url.indexOf("?")!=-1){
+                uid = url.substr(url.indexOf("=")+1);
+                $.ajax({
+                    url:"/user/toGetUserById",
+                    type:"GET",
+                    data:{"id":uid},
+                    success:function (result) {
+                        $("#username").append(result.map.uname);
+                    }
+                })
+            }
+        }
+        $(".addSubject").on("click",function () {
+            //location.href="saveSubject.html?uid="+uid;
+            $.ajax({
+                url:'/role/toSaveSubject',
+                type:'GET',
+                success:function (result) {
+                    if (result.code==200 ){
+                        location.href="saveSubject.html?uid="+uid;
+                    } else if (result.code==100) {
+                        layer.msg(result.map.message);
+                    }
+                }
+            })
+        });
+        $(".safeVote").on("click",function () {
+            //location.href="saveSubject.html?uid="+uid;
+            $.ajax({
+                url:'/role/toSafeVote',
+                type:'GET',
+                success:function (result) {
+                    if (result.code==200 ){
+                        location.href="safeVote.html?uid="+uid;
+                    } else if (result.code==100) {
+                        layer.msg(result.map.message);
+                    }
+                }
+            })
+        });
+        //监听提交
+        form.on('submit(subbtn)', function(data){
+           // layer.msg(JSON.stringify(data.field));
+           /* var a=$("input[name=options]").map(function(){return this.value;}).get();/!*.join(",");*!/
+                alert(a);*/
+            var find=false;
+            $("input[name='options']").each(function(){
+                var orginValue = $(this);
+                $("input[name='options']").not(orginValue).each(function(){
+                    if (orginValue.val() == $(this).val()){
+                        find = true;
+                    }
+                })
+            })
+            if (!find) {
+                 var date= $(".layui-form").serialize();
+                $.ajax({
+                    url:'/subject/saveSubject',
+                    type:"POST",
+                    data:date,
+                    success:function (result) {
+                        if (result.code==200){
+                            layer.msg("添加投票主题成功!");
+                            $(".layui-form").get(0).reset();
+                        }
+
+                    }
+                })
+            }else{
+                layer.msg("选项不得重复");
+            }
+            return false;
+        });
+        //增加选项
+        var count=1;
+        $(".addbtn").on("click",function () {
+           if (count<4) {
+               layer.msg("第"+(count+1)+"个了");
+               var iptDiv=$("<div></div>").addClass("layui-input-block");
+               var ipt=$("<input/>").addClass("layui-input foript").attr("name","options").attr("required","").attr("lay-verify","required").attr("placeholder","选项不得重复").appendTo(iptDiv);
+               var iptA=$("<a></a>").attr("href","javascript:;").addClass("delBtn").append("删除").appendTo(iptDiv);
+               var itemDiv=$("<div></div>").addClass("layui-form-item").append(iptDiv);
+               $("#opts").append(itemDiv);
+               form.render();
+               count++;
+           }else {
+               layer.msg("最多四个选项哦!");
+           }
+        })
+        //返回
+        $(".backbtn").on("click",function () {
+            location.href="voteMain.html?uid="+uid;
+        })
+        $(document).on("click",".delBtn",function () {
+           $(this).parent().parent().remove();
+            count--;
+        })
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>投票-注册</title>
+    <link rel="stylesheet" href="/resources/layui/css/layui.css" media="all">
+    <style type="text/css">
+        #regmain{
+            background-color:  RGBA(00,96,88,0.8);
+            border-radius: 10PX;
+            box-shadow: 0 0 10px #fdd8ac;
+        }
+        body{
+            margin:0;
+            padding:0;
+            background: url('/resources/images/background.jpg') no-repeat center center fixed;
+        }
+        .success{
+            color: #00FF00 !important;
+        }
+        .faile{
+            color: red !important;
+        }
+    </style>
+</head>
+<body >
+    <div class="layui-fluid" style="margin-top: 8%">
+        <div class="layui-row layui-col-space10" >
+            <div class="layui-col-md4">
+            </div>
+            <div class="layui-col-md4" id="regmain" >
+                <form class="layui-form" lay-filter="example">
+                    <div class="layui-form-item">
+                        <h1 style="text-align: center">注册-网上投票系统</h1>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户名:</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="username" required  lay-verify="username" placeholder="请输入用户名"  class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux" id="uinfo">必须由英文和数字组成</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户密码:</label>
+                        <div class="layui-input-inline">
+                            <input type="password" name="password" required lay-verify="pass" placeholder="请输入密码"  class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">密码必须6到12位</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">确认密码:</label>
+                        <div class="layui-input-inline">
+                            <input type="password" name="password2" required lay-verify="pass" placeholder="请输入密码"  class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux" id="upwd">两次密码需一致</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">真实姓名:</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="realename" required lay-verify="realename" placeholder="请输入真实姓名"  class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">必须填写中文</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="layui-col-md4">
+            </div>
+        </div>
+    </div>
+<script src="/resources/layui/layui.js"></script>
+    <script>
+        layui.use('form', function(){
+            var form = layui.form;
+            var $=layui.jquery;
+            //自定义验证规则
+            form.verify({
+                username: [
+                    /^[a-z0-9_-]{5,12}$/
+                    ,'用户名必须5到12位英文数字'
+                ]
+                ,pass: [
+                    /^[\S]{6,12}$/
+                    ,'密码必须6到12位，且不能出现空格'
+                ]
+                ,realename: [
+                        /^[\u2E80-\u9FFF]+$/
+                    ,'必须填写中文'
+                ]
+            });
+            var findname=false;
+            //用户名失焦点事件
+           $("input[name=username]").blur(function () {
+               var username= $(this).val();
+               if (""!=username) {
+                   $.ajax({
+                       url:'/user/toUsername/'+username,
+                       type:"GET",
+                       success:function (result) {
+                           if (result.code ==200 ){
+                               $("#uinfo").html(result.map.message).addClass("success").removeClass("faile");
+                               findname= true;
+                           }else if (result.code==100){
+                               $("#uinfo").html(result.map.message).addClass("faile").removeClass("success");
+                               findname= false;
+                           }
+                       }
+                   })
+               }
+               findname= false;
+            });
+
+
+            //监听提交
+            form.on('submit(formDemo)', function(data){
+               //var forminfo= JSON.stringify(data.field);
+               // layer.msg(forminfo);
+                var data2 = form.val('example');
+                //layer.msg(data2);
+                if (!findname) {
+                    return false;
+                }
+                if (data.field.password!=data.field.password2) {
+                    $("#upwd").html("两次输入密码不一致").addClass("faile").removeClass("success");
+                    return false;
+                }else {
+                    $("#upwd").html("密码OK").addClass("success").removeClass("faile");
+                }
+                $.ajax({
+                    url:'/user/toRegister',
+                    type:"POST",
+                    data:data2,
+                    success:function (result) {
+                        if (result.code==200){
+                            layer.msg(result.map.regInfo,{
+                                time: 0, //0 不自动关闭
+                                scrollbar: false,
+                                btn: ['速去登录'],
+                                yes:function (index) {
+                                    layer.close(index);
+                                    location.href="doLogin.html";
+                                }
+                            });
+                        } else if (result.code==100){
+                            layer.msg(result.map.regInfo,{
+                                time: 0, //20s后自动关闭
+                                scrollbar: false,
+                                btn: ['重新注册'],
+                                yes:function (index) {
+                                    layer.close(index);
+                                    location.href="register.html";
+                                }
+                            });
+                        }
+                    }
+                });
+               // layer.msg(JSON.stringify(data2));
+                return false;
+            });
+        });
+    </script>
+</body>
+</html>

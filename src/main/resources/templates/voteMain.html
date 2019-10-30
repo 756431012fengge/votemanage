@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>投票-详情</title>
+    <link rel="stylesheet" href="/resources/layui/css/layui.css" media="all">
+    <style type="text/css">
+        .forli{
+            margin: 20px 5px;
+            border-bottom: 1px coral solid;
+        }
+        .layui-icon{
+            font-size: 20px;
+            color: #1E9FFF;
+        }
+        .fordiv{
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-md2 ">
+            </div>
+            <div class="layui-col-md8">
+                <ul class="layui-nav">
+                    <li class="layui-nav-item">
+                        <a href=""><i class="layui-icon" style="font-size: 20px; color: #1E9FFF;">&#xe68e;</i> 首页</a>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">管理投票</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="javascript:;" class="addSubject"><i class="layui-icon" >&#xe61f;</i> 添加投票</a></dd>
+                            <dd><a href="javascript:;" class="safeVote"><i class="layui-icon" >&#xe631;</i> 维护投票</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item" >
+                        <a href="javascript:;" id="username"><img src="//t.cn/RCzsdCq" class="layui-nav-img"></a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="/menu/toLogout"><i class="layui-icon" >&#xe65c;</i> 退出登录</a></dd>
+                        </dl>
+                    </li>
+                </ul>
+                <div class="layui-row" style="margin-top: 10px">
+                    <div class="layui-col-md4" style="font-size: 30px"><i class="layui-icon" style="font-size: 30px" >&#xe705;</i> 投票列表</div>
+                    <div class="layui-col-md4">
+                        x
+                    </div>
+                    <div class="layui-col-md4">
+                        <form class="layui-form">
+                            <div class="layui-form-item">
+                                <div class="layui-form-item">
+                                    <div class="layui-input-inline" style="margin-right: 0px">
+                                        <input type="text" name="title"  placeholder="请输入搜索标题"  class="layui-input">
+                                    </div>
+                                    <div class="">
+                                        <button type="submit" class="layui-btn" lay-submit="" lay-filter="subbtn"><i class="layui-icon" style="color: white">&#xe615;</i>搜索</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <ul id="voteList">
+
+                </ul>
+                <div id="page"></div>
+            </div>
+            <div class="layui-col-md2">
+            </div>
+        </div>
+
+    </div>
+<script src="/resources/layui/layui.js"></script>
+    <script>
+        layui.use(['element','laypage','form'], function(){
+           // var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+            var $=layui.jquery;
+            var laypage = layui.laypage;
+            var form = layui.form;
+           // var layer=layui.layer;
+            //监听导航点击
+           /* element.on('nav(demo)', function(elem){
+                //console.log(elem)
+                layer.msg(elem.text());
+            });*/
+            $(".addSubject").on("click",function () {
+                //location.href="saveSubject.html?uid="+uid;
+                $.ajax({
+                    url:'/role/toSaveSubject',
+                    type:'GET',
+                    success:function (result) {
+                        if (result.code==200 ){
+                            location.href="saveSubject.html?uid="+uid;
+                        } else if (result.code==100) {
+                            layer.msg(result.map.message);
+                        }
+                    }
+                })
+            });
+            $(".safeVote").on("click",function () {
+                //location.href="saveSubject.html?uid="+uid;
+                $.ajax({
+                    url:'/role/toSafeVote',
+                    type:'GET',
+                    success:function (result) {
+                        if (result.code==200 ){
+                            location.href="safeVote.html?uid="+uid;
+                        } else if (result.code==100) {
+                            layer.msg(result.map.message);
+                        }
+                    }
+                })
+            });
+            function toPage(){
+                //完整功能
+                laypage.render({
+                    elem: 'page'
+                    ,count: totalPage
+                    ,theme: '#FF5722',//主题颜色
+                    limits: [2, 3, 4, 5],
+                    // 连续出现的页码个数
+                    groups:5,
+                    limit:pageSize,
+                    // 自定义首页、尾页、上一页、下一页文本
+                    first: '首页',
+                    last: '尾页',
+                    prev: '<em><<</em>',
+                    next: '<em>>></em>'
+                    ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                    ,jump: function(data,first){
+                        console.log(data);
+                        // data包含了当前分页的所有参数
+                       var currPage = data.curr;
+                        pageSize = data.limit;
+                        // 首次不执行
+                        if (!first) {
+                            viewList(currPage,title);
+                        }
+                    }
+                });
+            }
+
+
+            $(function () {
+                detail();
+                viewList(1);
+                toPage();
+            });
+            //获取地址ID显示用户名
+            var uid;
+            function detail() {
+                var url=window.location.search; //获取url中"?"符后的字串  
+                if(url.indexOf("?")!=-1){
+                     uid = url.substr(url.indexOf("=")+1);
+                    $.ajax({
+                        url:"/user/toGetUserById",
+                        type:"GET",
+                        data:{"id":uid},
+                        success:function (result) {
+                            $("#username").append(result.map.uname);
+                        }
+                    })
+                }
+            }
+            var totalPage;
+            var pageSize;
+            //获取页面信息
+            function viewList(pageNum,title) {
+                $.ajaxSettings.async = false;
+                $.ajax({
+                    url:'/voteinfo/toGetVoteList',
+                    type:"GET",
+                    data:{"pageNum":pageNum,"pageSize":pageSize,"title":title},
+                    success:function (result) {
+                        if(result.code ==200 ){
+                            $("#voteList").empty();
+                            $.each(result.map.page.list,function (index,item) {
+                                var toli=$("<li></li>").addClass("forli");
+                                var toi=$("<i></i>").addClass("layui-icon layui-icon-reply-fill");
+                                var toa=$("<a></a>").attr("href","javascript:;").append(item.title);
+                                var h4=$("<h4></h4>").append(toi).append(toa);
+                                var dcol6=$("<div></div>").addClass("layui-col-md6 ").append("共有"+item.optionCount+" 选项,已有"+item.voteCount+"个投票");
+                                var dcol4=$("<div></div>").addClass("layui-col-md4 ").append("——");
+                                var toi2=$("<i></i>").addClass("layui-icon layui-icon-praise");
+
+                                var toa2=$("<a></a>").attr("href","javascript:;").addClass("joinbtn").attr("subid",item.sid).append("我要参与");
+                                var dcol2=$("<div></div>").addClass("layui-col-md2").append(toi2).append(toa2);
+                                var drow=$("<div></div>").addClass("layui-row fordiv").append(dcol6).append(dcol4).append(dcol2);
+                                toli.append(h4).append(drow).appendTo("#voteList");
+                            });
+                            totalPage=result.map.page.total;
+                            pageSize=result.map.page.pageSize;
+                        }
+                    }
+                });
+                $.ajaxSettings.async = true;
+            }
+
+            var title="";
+            //监听提交事件
+            //监听提交
+            form.on('submit(subbtn)', function(data){
+                title=data.field.title;
+                viewList(1,title);
+                toPage();
+                return false;
+            });
+            //参与投票权限判定
+            $(document).on("click",".joinbtn",function () {
+               var sid= $(this).attr("subid");
+                $.ajax({
+                    url:'/role/toSaveVote',
+                    type:'GET',
+                    success:function (result) {
+                        if (result.code==200 ){
+                            location.href= "voteDetail.html?sid="+sid+"&uid="+uid;
+                        } else if (result.code==100) {
+                            layer.msg(result.map.message);
+                        }
+                    }
+                });
+            })
+        });
+    </script>
+</body>
+</html>

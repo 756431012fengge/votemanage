@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+  <title>投票-登入</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="icon" href="/resources/favicon.ico">
+  <link rel="stylesheet" href="/resources/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="/resources/css/admin.css" media="all">
+  <link rel="stylesheet" href="/resources/css/login.css" media="all">
+  <style type="text/css">
+  body{
+    margin:0;
+    padding:0;
+    background: url('/resources/images/bridge.jpg') no-repeat center center fixed;
+ /* -webkit-background-size: cover;
+      -moz-background -size: cover;
+      -o-background-size: cover;
+      background-size: cover;*/
+  }
+	#vercodet{
+	 height: 36px;
+
+	}
+/*	video {
+    width: 100%;
+    height: 115%;
+	top:-80px;
+	padding:0px;
+    position: fixed;
+    z-index: -999;
+    }*/
+
+    .layadmin-user-login-main{
+    	background-color:  RGBA(00,96,88,0.8);
+    	border-radius: 10PX;
+    	box-shadow: 0 0 10px #fdd8ac;
+    }
+
+  </style>
+</head>
+<body>
+<!--<video  loop="loop" autoplay>
+     <source src="images/现代职场的数据统计_爱给网_aigei_com.mp4"/>
+     您的浏览器不支持video标签
+  </video>-->
+
+  <div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+    <div class="layadmin-user-login-main">
+      <div class="layadmin-user-login-box layadmin-user-login-header">
+        <h2>自由投票-freesun</h2>
+        <p>freesun 官方出品的自由投票系统</p>
+      </div>
+      <div class="layadmin-user-login-box layadmin-user-login-body layui-form" lay-filter="example">
+        <div class="layui-form-item">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-username" for="LAY-user-login-username"></label>
+          <input type="text" name="username" id="LAY-user-login-username" lay-verify="username" placeholder="用户名" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+          <input type="password" name="password" id="LAY-user-login-password" lay-verify="pass" placeholder="密码" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-row">
+            <div class="layui-col-xs7">
+              <label class="layadmin-user-login-icon layui-icon layui-icon-vercode" for="LAY-user-login-vercode"></label>
+              <input type="text" name="vercode" id="LAY-user-login-vercode" lay-verify="vercodet" placeholder="图形验证码" class="layui-input">
+            </div>
+            <div class="layui-col-xs5">
+              <div style="margin-left: 10px;" id="vercodet">
+               
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="layui-form-item" style="margin-bottom: 20px;">
+          <input type="checkbox" name="remember" lay-skin="primary" title="同意青鸟租房协议" lay-filter="checkb" lay-verify="checkb">
+          <a href="forget.html" class="layadmin-user-jump-change layadmin-link" style="margin-top: 7px;">忘记密码？</a>
+        </div>
+        <div class="layui-form-item">
+          <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-login-submit">登 入</button>
+        </div>
+        <div class="layui-trans layui-form-item layadmin-user-login-other">
+          <label>社交账号登入</label>
+          <a href="javascript:;"><i class="layui-icon layui-icon-login-qq"></i></a>
+          <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat"></i></a>
+          <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo"></i></a>
+          
+          <a href="register.html" class="layadmin-user-jump-change layadmin-link">注册帐号</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="layui-trans layadmin-user-login-footer">
+      
+      <p>© 2018 <a href="http://www.layui.com/" target="_blank">layui.com</a></p>
+      <p>
+        <span><a href="http://www.layui.com/admin/#get" target="_blank">获取授权</a></span>
+        <span><a href="http://www.layui.com/admin/pro/" target="_blank">在线演示</a></span>
+        <span><a href="http://www.layui.com/admin/" target="_blank">前往官网</a></span>
+      </p>
+    </div>
+
+    <!--<div class="ladmin-user-login-theme">
+      <script type="text/html" template>
+        <ul>
+          <li data-theme=""><img src="{{ layui.setter.base }}style/res/bg-none.jpg"></li>
+          <li data-theme="#03152A" style="background-color: #03152A;"></li>
+          <li data-theme="#2E241B" style="background-color: #2E241B;"></li>
+          <li data-theme="#50314F" style="background-color: #50314F;"></li>
+          <li data-theme="#344058" style="background-color: #344058;"></li>
+          <li data-theme="#20222A" style="background-color: #20222A;"></li>
+        </ul>
+      </script>
+    </div>-->
+    
+  </div> 
+  <script src="/resources/js/gVerify.js" ></script>
+  <script src="/resources/layui/layui.js"></script>
+  <script>
+  layui.use(['layer', 'form'], function(){
+    var $ = layui.$
+    ,layer = layui.layer
+    ,form = layui.form;
+    
+    form.render();
+    var verifyCode = new GVerify("vercodet");
+    //提交
+    //自定义验证规则
+  	form.verify({
+    	username: function(value){
+    		if(!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+    		      return '用户名不能有特殊字符';
+    		    }
+    		    if(/(^\_)|(\__)|(\_+$)/.test(value)){
+    		      return '用户名首尾不能出现下划线\'_\'';
+    		    }
+    		    if(/^\d+\d+\d$/.test(value)){
+    		      return '用户名不能全为数字';
+    		    }
+    }
+    ,pass: [
+      	/^[\S]{6,12}$/
+      ,'密码必须6到12位，且不能出现空格'
+    ]
+    ,vercodet: function (value) {
+		if(!verifyCode.validate(value)){
+			return '验证码错误';
+		}
+	}
+    ,checkb : function (value) {
+		if(!chbox){		
+			return '请同意协议!';
+		}
+	}
+  }); 
+  	var chbox=false;
+  	form.on('checkbox(checkb)', function(data){
+		 chbox=data.elem.checked //是否被选中，true或者false
+  	});   
+    form.on('submit(LAY-user-login-submit)', function(obj){
+    	var data = form.val('example');
+    	$.post('/user/login',data,function(result){
+    		if(result.code==200){
+    			layer.open({
+    		        type: 1
+    		        ,title: false //不显示标题栏
+    		        ,closeBtn: false
+    		        ,area: '300px;'
+    		        ,shade: 0.8
+    		        ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+    		        ,btn: ['火速进入']
+    		        ,btnAlign: 'c'
+    		        ,moveType: 1 //拖拽模式，0或者1
+    		        ,content: '<div style="padding: 20px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;text-align: center;">' +
+                          '<i class="layui-icon layui-icon-ok-circle" style="font-size: 50px; color: #1E9FFF;"></i><br>'+result.map.loginInfo+'<br>我们此后的征途是星辰大海 ^_^</div>'
+    		        ,success: function(layero){
+    		          var btn = layero.find('.layui-layer-btn');
+    		          btn.find('.layui-layer-btn0').attr({
+                        href: 'voteMain.html?uid='+result.map.userInfo
+                        ,target: '_self'
+    		          });
+    		        }
+    		      });
+    		}else if(result.code==100){
+    			layer.open({
+    		        type: 1
+    		        ,title: false //不显示标题栏
+    		        ,closeBtn: false
+    		        ,area: '300px;'
+    		        ,shade: 0.8
+    		        ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+    		        ,btn: ['再试一次']
+    		        ,btnAlign: 'c'
+    		        ,moveType: 1 //拖拽模式，0或者1
+    		        ,content: '<div style="padding: 20px; line-height: 22px; background-color: #393D49;color: #fff; font-weight: 300;text-align: center;">' +
+                          '<i class="layui-icon layui-icon-close-fill" style="font-size: 50px; color: #1E9FFF;"></i><br>'+result.map.loginInfo+'<br>山水有相逢 ^_^</div>'
+    		        ,success: function(layero){
+    		          var btn = layero.find('.layui-layer-btn');
+    		          btn.find('.layui-layer-btn0').attr({
+    		            href: ''
+    		            ,target: '_self'
+    		          });
+    		        }
+    		      });
+    		}
+    	})
+    	return false;
+    });
+  });
+  </script>
+</body>
+</html>

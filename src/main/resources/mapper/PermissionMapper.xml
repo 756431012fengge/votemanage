@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.freesun.votemanager.mapper.PermissionMapper">
+
+    <select id="getPermissionByUid" resultType="Permission">
+        SELECT DISTINCT p.* FROM permission p
+        INNER JOIN role_permission rp
+        INNER JOIN role_user ru
+        ON (p.pid=rp.pid AND rp.rid=ru.rid )
+        WHERE ru.uid=#{uid}
+    </select>
+</mapper>
